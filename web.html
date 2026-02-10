@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carwyn coll</title>
+    <!-- โหลด Tailwind CSS เพื่อจัด Layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- โหลดฟอนต์ Prompt จาก Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- โหลดไอคอน -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ตั้งค่าพื้นฐาน */
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #fdfbf7; /* สีครีมอ่อนๆ */
+            color: #5d5d5d;
+            overflow-x: hidden;
+        }
+
+        /* โทนสีพาสเทล */
+        :root {
+            --pastel-pink: #ffb7b2;
+            --pastel-mint: #b5ead7;
+            --pastel-purple: #c7ceea;
+            --pastel-peach: #ffdac1;
+            --pastel-yellow: #fff5ba;
+        }
+
+        /* ลูกเล่นพื้นหลังลอยไปมา (Floating Blobs) */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 10s infinite ease-in-out;
+        }
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(20px, -20px) scale(1.1); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        /* สไตล์ของการ์ดผลงาน */
+        .work-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            aspect-ratio: 1 / 1; /* บังคับสี่เหลี่ยมจัตุรัส */
+            cursor: pointer;
+        }
+
+        .work-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .work-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .work-card:hover img {
+            transform: scale(1.1);
+        }
+
+        /* ปุ่ม Overlay ที่จะโผล่มาตอน Hover */
+        .card-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(2px);
+        }
+
+        .work-card:hover .card-overlay {
+            opacity: 1;
+        }
+
+        .view-btn {
+            background: linear-gradient(45deg, var(--pastel-pink), var(--pastel-purple));
+            color: white;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(255, 183, 178, 0.4);
+            transform: translateY(20px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .work-card:hover .view-btn {
+            transform: translateY(0);
+        }
+
+        .view-btn:hover {
+            box-shadow: 0 6px 15px rgba(255, 183, 178, 0.6);
+            background: linear-gradient(45deg, var(--pastel-purple), var(--pastel-pink));
+        }
+
+        /* Navigation */
+        .nav-pill {
+            transition: all 0.3s ease;
+        }
+        .nav-pill:hover, .nav-pill.active {
+            background-color: var(--pastel-mint);
+            color: #4a4a4a;
+            transform: scale(1.05);
+        }
+
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="relative">
+
+    <!-- พื้นหลังเคลื่อนไหว -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="blob bg-red-200 w-64 h-64 top-0 left-0 mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+        <div class="blob bg-purple-200 w-64 h-64 top-0 right-0 mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div class="blob bg-green-200 w-64 h-64 -bottom-8 left-20 mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+    </div>
+
+    <!-- ส่วนหัว (Header) -->
+    <header class="text-center py-16 px-4 relative z-10">
+        <div class="inline-block p-2 border-4 border-dashed border-pink-300 rounded-full mb-4">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Profile" class="w-32 h-32 rounded-full bg-white">
+        </div>
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-700 mb-2">Carwyn Coll ✨</h1>
+        <p class="text-xl text-gray-500 max-w-2xl mx-auto">ยินดีต้อนรับสู่คลังของยูนี่คือเว็บไซต์เพื่อเลือกของเพื่อทำป้ายกับยู งดแคปหาวาร์ป  </p>
+                <p class="text-xl text-gray-500 max-w-2xl mx-auto">พบเจอปรับ 200 หากอยากได้วาร์ปถามกับยูเท่านั้น ไม่มีค่าถามแน่นอน </p>    
+    </header>
+
+    <!-- เมนูนำทาง (Navigation) -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm py-4">
+        <div class="container mx-auto px-4 overflow-x-auto whitespace-nowrap scrollbar-hide text-center" id="category-nav">
+            <!-- ปุ่มหมวดหมู่จะถูกสร้างด้วย JavaScript -->
+        </div>
+    </nav>
+
+    <!-- พื้นที่แสดงผลงาน (Main Content) -->
+    <main class="container mx-auto px-4 py-10 relative z-10" id="portfolio-container">
+        <!-- ผลงานทั้ง 8 หมวดหมู่จะถูกสร้างด้วย JavaScript ที่นี่ -->
+    </main>
+
+    <!-- ส่วนท้าย (Contact Footer) -->
+    <footer class="bg-white/90 backdrop-blur border-t-4 border-purple-200 py-12 relative z-10 mt-10">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold text-gray-700 mb-8">ช่องทางติดต่อ 💖</h2>
+            
+            <div class="flex justify-center gap-6 mb-8 flex-wrap">
+                <a href="#" class="group flex flex-col items-center gap-2 text-gray-600 hover:text-pink-500 transition">
+                    <div class="w-14 h-14 bg-pink-100 rounded-full flex items-center justify-center group-hover:scale-110 transition shadow-sm">
+                        <i class="fab fa-facebook-f text-2xl"></i>
+                    </div>
+                    <span>Facebook</span>
+                </a>
+                <a href="#" class="group flex flex-col items-center gap-2 text-gray-600 hover:text-purple-500 transition">
+                    <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center group-hover:scale-110 transition shadow-sm">
+                        <i class="fab fa-instagram text-2xl"></i>
+                    </div>
+                    <span>Instagram</span>
+                </a>
+                <a href="#" class="group flex flex-col items-center gap-2 text-gray-600 hover:text-green-500 transition">
+                    <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center group-hover:scale-110 transition shadow-sm">
+                        <i class="fab fa-line text-2xl"></i>
+                    </div>
+                    <span>Line ID</span>
+                </a>
+                <a href="#" class="group flex flex-col items-center gap-2 text-gray-600 hover:text-blue-500 transition">
+                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center group-hover:scale-110 transition shadow-sm">
+                        <i class="fas fa-envelope text-2xl"></i>
+                    </div>
+                    <span>Email</span>
+                </a>
+            </div>
+
+            <p class="text-gray-400 text-sm">© 2024 My Pastel Portfolio. Designed with Love.</p>
+        </div>
+    </footer>
+
+    <!-- Script สำหรับสร้างเนื้อหาและจัดการระบบ -->
+    <script>
+        // ==========================================
+        // ส่วนแก้ไขข้อมูล (DATA CONFIGURATION)
+        // แก้ไขข้อมูลตรงนี้เพื่อให้เป็นเว็บของคุณเอง
+        // ==========================================
+        
+        const categories = [
+            { id: 'cat1', name: 'ตัวอย่าง & ปล่อยเอฟ', color: 'bg-pink-100' },
+            { id: 'cat2', name: 'กลุ่มรวม', color: 'bg-blue-100' },
+            { id: 'cat3', name: 'กลุ่ม BOX', color: 'bg-green-100' },
+            { id: 'cat4', name: 'กลุ่มตัวตูน', color: 'bg-yellow-100' },
+            { id: 'cat5', name: 'กลุ่มลายเส้น', color: 'bg-purple-100' },
+            { id: 'cat6', name: 'กลุ่มฟ้อนต์', color: 'bg-red-100' },
+            { id: 'cat7', name: 'กลุ่มตุ้งติ้ง', color: 'bg-orange-100' },
+            { id: 'cat8', name: 'กลุ่มชิ้นส่วน BOX', color: 'bg-gray-100' }
+        ];
+
+        // ฟังก์ชั่นสุ่มรูปภาพ (Placeholder) 
+        // *ในการใช้งานจริง คุณสามารถเปลี่ยน url ในฟังก์ชัน renderPortfolio ให้เป็นรูปของคุณเองได้
+        function getPlaceholderImage(categoryIndex, itemIndex) {
+            // ใช้บริการ placehold.co เพื่อสร้างรูปสีพาสเทล
+            const colors = ['ffb7b2', 'b5ead7', 'c7ceea', 'ffdac1', 'e2f0cb'];
+            const color = colors[(categoryIndex + itemIndex) % colors.length];
+            return `https://placehold.co/400x400/${color}/ffffff?text=Work+${itemIndex+1}`;
+        }
+
+        // ==========================================
+        // ระบบการทำงาน (SYSTEM LOGIC)
+        // ==========================================
+
+        const navContainer = document.getElementById('category-nav');
+        const portfolioContainer = document.getElementById('portfolio-container');
+
+        // 1. สร้างปุ่ม Navigation
+        categories.forEach((cat, index) => {
+            const btn = document.createElement('a');
+            btn.href = `#${cat.id}`;
+            btn.className = `nav-pill inline-block px-6 py-2 mx-1 rounded-full text-gray-600 font-medium hover:shadow-md cursor-pointer ${cat.color} bg-opacity-50`;
+            btn.innerText = cat.name;
+            
+            // Smooth Scroll
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById(cat.id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            
+            navContainer.appendChild(btn);
+        });
+
+        // 2. สร้าง Grid ผลงาน (8 หมวด x 9 ช่อง)
+        categories.forEach((cat, catIndex) => {
+            // สร้าง Section Container
+            const section = document.createElement('section');
+            section.id = cat.id;
+            section.className = "mb-20 pt-10 reveal"; // เพิ่ม class reveal เพื่อทำ animation
+
+            // หัวข้อหมวดหมู่
+            const header = document.createElement('div');
+            header.className = "flex items-center mb-8";
+            header.innerHTML = `
+                <div class="w-2 h-10 ${cat.color.replace('bg-', 'bg-')} mr-4 rounded-full bg-opacity-100" style="background-color: var(--pastel-pink)"></div>
+                <h2 class="text-3xl font-bold text-gray-700">${cat.name}</h2>
+            `;
+            section.appendChild(header);
+
+            // Grid Container
+            const grid = document.createElement('div');
+            grid.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6";
+
+            // สร้าง 9 ช่อง
+            for (let i = 0; i < 9; i++) {
+                const card = document.createElement('div');
+                card.className = "work-card group";
+                
+                // รูปภาพ (แก้ src ตรงนี้ถ้าจะใส่รูปจริงแบบ manual)
+                const imgSrc = getPlaceholderImage(catIndex, i);
+                
+                card.innerHTML = `
+                    <img src="${imgSrc}" alt="Work ${i+1}" loading="lazy">
+                    <div class="card-overlay">
+                        <h3 class="text-xl font-bold text-gray-700 mb-2">Project ${i+1}</h3>
+                        <p class="text-gray-500 text-sm mb-4">คลิกเพื่อดูรายละเอียด</p>
+                        <!-- ปุ่มลิงก์ไปยัง Drive -->
+                        <a href="https://drive.google.com" target="_blank" class="view-btn">
+                            <i class="fas fa-eye mr-2"></i> ดูตัวอย่าง
+                        </a>
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
+
+            section.appendChild(grid);
+            portfolioContainer.appendChild(section);
+        });
+
+        // 3. Scroll Reveal Animation (ทำให้ของค่อยๆ โผล่มาตอนเลื่อนจอ)
+        const revealElements = document.querySelectorAll('.reveal');
+
+        const revealOnScroll = () => {
+            const windowHeight = window.innerHeight;
+            const elementVisible = 150;
+
+            revealElements.forEach((reveal) => {
+                const elementTop = reveal.getBoundingClientRect().top;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveal.classList.add('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', revealOnScroll);
+        // เรียกใช้ครั้งแรกเผื่อโหลดมาแล้วเจอเลย
+        revealOnScroll();
+
+    </script>
+</body>
+</html>
